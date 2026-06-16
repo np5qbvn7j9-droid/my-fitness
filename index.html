@@ -125,6 +125,17 @@
         .ptable th,.ptable td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:0.78rem}
         .ptable th{color:var(--pr);font-weight:700}
         .ptable td{color:var(--muted)}
+        .wt-sec{background:var(--card2);border-radius:10px;padding:10px 12px;margin-top:8px}
+        .wt-label{font-size:0.75rem;color:var(--pr);font-weight:700;margin-bottom:6px}
+        .wt-row{display:flex;align-items:center;gap:8px}
+        .wt-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:1rem;font-family:'Cairo',sans-serif;text-align:center;-webkit-appearance:none}
+        .wt-input::placeholder{color:#555}
+        .wt-unit{color:var(--muted);font-size:0.85rem}
+        .wt-save{background:var(--pr);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:0.8rem;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer}
+        .wt-save:active{opacity:0.7}
+        .wt-prev{font-size:0.75rem;color:var(--muted);margin-top:6px}
+        .wt-prev span{color:var(--text);font-weight:700}
+        .wt-saved{color:#00b894;font-size:0.75rem;margin-top:4px;display:none}
         .update-btn{position:fixed;bottom:calc(20px + var(--safe-b));left:20px;width:48px;height:48px;border-radius:50%;background:var(--pr);color:#fff;border:none;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(255,107,53,0.4);z-index:999;cursor:pointer;transition:transform 0.3s}
         .update-btn:active{transform:scale(0.9)}
         .update-btn.spinning{animation:spin 1s linear infinite}
@@ -447,6 +458,40 @@ function forceUpdate(){
         location.reload(true);
     }
 }
+
+const noWeight=['Plank','Crunch','HIIT','Bodyweight Circuit','Mobility Flow','Dips','Functional Circuit'];
+function getWeek(){const d=new Date(),start=new Date(d.getFullYear(),0,1);return Math.ceil(((d-start)/86400000+start.getDay()+1)/7)}
+function wtKey(name,week){return 'wt_'+name+'_w'+week}
+function saveWt(name,btn){
+    const input=btn.parentElement.querySelector('.wt-input');
+    const val=parseFloat(input.value);
+    if(!val)return;
+    const week=getWeek();
+    localStorage.setItem(wtKey(name,week),val);
+    const saved=btn.parentElement.parentElement.querySelector('.wt-saved');
+    saved.style.display='block';
+    saved.textContent='✓ تم الحفظ — '+val+' كجم';
+    setTimeout(()=>{saved.style.display='none'},2000);
+}
+document.querySelectorAll('.ex-card').forEach(card=>{
+    const en=card.querySelector('.ex-en');
+    if(!en)return;
+    const name=en.textContent.trim();
+    if(noWeight.some(nw=>name.includes(nw)))return;
+    const body=card.querySelector('.ex-body');
+    if(!body)return;
+    const week=getWeek();
+    const prev=localStorage.getItem(wtKey(name,week-1));
+    const curr=localStorage.getItem(wtKey(name,week));
+    let prevHtml=prev?'<div class="wt-prev">الأسبوع الماضي: <span>'+prev+' كجم</span></div>':'';
+    const div=document.createElement('div');
+    div.className='wt-sec';
+    div.innerHTML='<div class="wt-label">⚖️ سجّل الوزن</div>'+
+        '<div class="wt-row"><input type="number" class="wt-input" placeholder="'+(curr||'الوزن')+'" step="0.5" value="'+(curr||'')+'"'+
+        '><span class="wt-unit">كجم</span><button class="wt-save" onclick="event.stopPropagation();saveWt(\''+name.replace(/'/g,"\\'")+'\',this)">حفظ</button></div>'+
+        prevHtml+'<div class="wt-saved"></div>';
+    body.appendChild(div);
+});
 </script>
 <button class="update-btn" id="upd-btn" onclick="forceUpdate()">🔄</button>
 </body>
