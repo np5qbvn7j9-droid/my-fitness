@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="تدريبي">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>تدريبي</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --pr:#ff6b35;--bg:#0a0a0a;--card:#141414;--card2:#1c1c1c;
+            --text:#f0f0f0;--muted:#999;--border:#222;
+            --push:#e17055;--pull:#0984e3;--legs:#00b894;
+            --cardio:#6c5ce7;--func:#fdcb6e;--arms:#e84393;
+            --safe-b:env(safe-area-inset-bottom,0px);
+            --safe-t:env(safe-area-inset-top,0px);
+        }
+        html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+        .app{display:flex;flex-direction:column;height:100dvh}
+        .safe-top{height:var(--safe-t);background:var(--bg);flex-shrink:0}
+        .screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+        .screen.active{display:flex}
+        .home-header{padding:24px 20px 12px;flex-shrink:0}
+        .home-header h1{font-size:1.5rem;font-weight:900}
+        .home-header .sub{font-size:0.85rem;color:var(--muted);margin-top:2px}
+        .home-header .motiv{font-size:0.8rem;color:var(--pr);font-weight:600;margin-top:6px}
+        .home-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 100px}
+        .day-card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:12px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+        .day-card:active{transform:scale(0.98);background:var(--card2)}
+        .day-card.today{border-color:rgba(255,107,53,0.4)}
+        .day-card.today::before{content:'اليوم';position:absolute;top:10px;left:10px;background:var(--pr);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:8px}
+        .dc-emoji{font-size:2.2rem;flex-shrink:0}
+        .dc-info{flex:1}
+        .dc-day{font-size:0.75rem;color:var(--muted);font-weight:600}
+        .dc-title{font-size:1.05rem;font-weight:800}
+        .dc-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+        .dc-tag{font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:600}
+        .dc-arrow{color:var(--muted);font-size:1.2rem;flex-shrink:0}
+        .t-push{background:rgba(225,112,85,0.15);color:var(--push)}
+        .t-pull{background:rgba(9,132,227,0.15);color:var(--pull)}
+        .t-legs{background:rgba(0,184,148,0.15);color:var(--legs)}
+        .t-cardio{background:rgba(108,92,231,0.15);color:var(--cardio)}
+        .t-func{background:rgba(253,203,110,0.15);color:var(--func)}
+        .t-core{background:rgba(255,107,53,0.15);color:var(--pr)}
+        .t-rest{background:rgba(108,92,231,0.15);color:var(--cardio)}
+        .food-card{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(0,184,148,0.1),rgba(255,107,53,0.05));border:1px solid rgba(0,184,148,0.2);border-radius:16px;padding:18px 16px;margin-bottom:12px;margin-top:8px;cursor:pointer;transition:all 0.2s}
+        .food-card:active{transform:scale(0.98)}
+        .day-top{display:flex;align-items:center;gap:12px;padding:14px 16px;flex-shrink:0;border-bottom:1px solid var(--border)}
+        .back-btn{background:rgba(255,255,255,0.06);border:none;color:var(--text);width:36px;height:36px;border-radius:10px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif}
+        .day-top-title{font-size:1.1rem;font-weight:800;flex:1}
+        .day-top-count{font-size:0.75rem;color:var(--muted);font-weight:600}
+        .day-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:40px}
+        .day-banner{margin:16px;padding:20px;border-radius:18px;text-align:center;position:relative;overflow:hidden}
+        .day-banner::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,0.06);border-radius:18px;pointer-events:none}
+        .db-push{background:linear-gradient(135deg,rgba(225,112,85,0.15),rgba(225,112,85,0.03))}
+        .db-pull{background:linear-gradient(135deg,rgba(9,132,227,0.15),rgba(9,132,227,0.03))}
+        .db-legs{background:linear-gradient(135deg,rgba(0,184,148,0.15),rgba(0,184,148,0.03))}
+        .db-cardio{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(108,92,231,0.03))}
+        .db-func{background:linear-gradient(135deg,rgba(253,203,110,0.15),rgba(253,203,110,0.03))}
+        .db-rest{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(108,92,231,0.03))}
+        .db-food{background:linear-gradient(135deg,rgba(0,184,148,0.12),rgba(255,107,53,0.05))}
+        .day-banner .emo{font-size:2.5rem;display:block;margin-bottom:6px}
+        .day-banner h2{font-size:1.2rem;font-weight:800}
+        .day-banner p{font-size:0.8rem;color:var(--muted);margin-top:4px}
+        .ex-card{margin:0 12px 10px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.2s}
+        .ex-card.open{border-color:rgba(255,107,53,0.35);background:var(--card2)}
+        .ex-head{display:flex;align-items:center;gap:10px;padding:14px;cursor:pointer}
+        .ex-n{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0}
+        .n-push{background:rgba(225,112,85,0.15);color:var(--push)}
+        .n-pull{background:rgba(9,132,227,0.15);color:var(--pull)}
+        .n-legs{background:rgba(0,184,148,0.15);color:var(--legs)}
+        .n-cardio{background:rgba(108,92,231,0.15);color:var(--cardio)}
+        .n-func{background:rgba(253,203,110,0.15);color:var(--func)}
+        .ex-title{flex:1;min-width:0}
+        .ex-name{font-size:0.9rem;font-weight:700;line-height:1.3}
+        .ex-en{font-size:0.65rem;color:var(--muted)}
+        .ex-badges{display:flex;gap:5px;flex-shrink:0}
+        .bd{text-align:center;padding:3px 7px;background:rgba(255,255,255,0.04);border-radius:8px}
+        .bd-v{font-weight:800;font-size:0.75rem;color:var(--pr)}
+        .bd-l{font-size:0.55rem;color:var(--muted)}
+        .ex-arr{font-size:0.65rem;color:var(--muted);transition:transform 0.2s;flex-shrink:0}
+        .ex-card.open .ex-arr{transform:rotate(180deg)}
+        .ex-body{display:none;border-top:1px solid var(--border)}
+        .ex-card.open .ex-body{display:block;animation:fadeIn 0.25s ease}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .ex-anim-wrap{width:100%;height:340px;background:#080808;position:relative;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        .ex-anim-wrap .frame{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain}
+        .ex-anim-wrap .frame.f0{animation:showA 1.6s steps(1) infinite}
+        .ex-anim-wrap .frame.f1{animation:showB 1.6s steps(1) infinite}
+        @keyframes showA{0%{opacity:1}50%{opacity:0}}
+        @keyframes showB{0%{opacity:0}50%{opacity:1}}
+        .anim-tag{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--pr);font-weight:700;background:rgba(0,0,0,0.8);padding:3px 12px;border-radius:8px;z-index:2}
+        .sec{padding:14px}
+        .sec-t{font-size:0.8rem;font-weight:700;color:var(--pr);margin-bottom:8px}
+        .muscles{display:flex;gap:4px;flex-wrap:wrap}
+        .musc{padding:3px 10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:0.72rem;color:var(--muted)}
+        .steps{list-style:none;counter-reset:s}
+        .steps li{counter-increment:s;padding:6px 0 6px 0;padding-right:26px;position:relative;color:var(--muted);font-size:0.82rem;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.03)}
+        .steps li:last-child{border-bottom:none}
+        .steps li::before{content:counter(s);position:absolute;right:0;top:7px;width:18px;height:18px;border-radius:50%;background:rgba(255,107,53,0.15);color:var(--pr);font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+        .tips{list-style:none}
+        .tips li{padding:4px 0 4px 0;padding-right:18px;position:relative;color:#00b894;font-size:0.78rem;line-height:1.6}
+        .tips li::before{content:'✓';position:absolute;right:0;font-weight:700}
+        .cardio-box{margin:12px;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(255,107,53,0.1),rgba(255,107,53,0.02));border:1px solid rgba(255,107,53,0.15)}
+        .cardio-box h3{font-size:0.9rem;color:var(--pr);font-weight:700;margin-bottom:4px}
+        .cardio-box p{font-size:0.82rem;color:var(--muted);line-height:1.7}
+        .rest-grid{padding:0 12px}
+        .rest-c{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 16px;margin-bottom:10px}
+        .rest-c .ri{font-size:2rem;margin-bottom:6px}
+        .rest-c h3{font-size:0.95rem;font-weight:700;margin-bottom:4px}
+        .rest-c p{font-size:0.82rem;color:var(--muted);line-height:1.7}
+        .info-c{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:0 12px 10px}
+        .info-c h3{font-size:0.95rem;font-weight:700;margin-bottom:8px}
+        .il{list-style:none}
+        .il li{padding:5px 0 5px 0;padding-right:14px;position:relative;color:var(--muted);font-size:0.82rem;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.03)}
+        .il li:last-child{border-bottom:none}
+        .il li::before{content:'•';position:absolute;right:0;color:var(--pr);font-weight:700}
+        .ptable{width:100%;border-collapse:collapse;margin-top:6px}
+        .ptable th,.ptable td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:0.78rem}
+        .ptable th{color:var(--pr);font-weight:700}
+        .ptable td{color:var(--muted)}
+        .update-btn{position:fixed;bottom:calc(20px + var(--safe-b));left:20px;width:48px;height:48px;border-radius:50%;background:var(--pr);color:#fff;border:none;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(255,107,53,0.4);z-index:999;cursor:pointer;transition:transform 0.3s}
+        .update-btn:active{transform:scale(0.9)}
+        .update-btn.spinning{animation:spin 1s linear infinite}
+        @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+<div class="app">
+<div class="safe-top"></div>
+
+<!-- HOME -->
+<div class="screen active" id="home">
+    <div class="home-header">
+        <h1>أهلاً غازي 🏃</h1>
+        <div class="sub">برنامج رياضي لبناء جسم لياقي متناسق</div>
+        <div class="motiv" id="motiv"></div>
+    </div>
+    <div class="home-scroll">
+        <div class="day-card" onclick="openDay('d1')" id="card-d1"><div class="dc-emoji">🔥</div><div class="dc-info"><div class="dc-day">اليوم 1 — السبت</div><div class="dc-title">دفع + كارديو</div><div class="dc-tags"><span class="dc-tag t-push">صدر</span><span class="dc-tag t-push">أكتاف</span><span class="dc-tag t-push">ترايسبس</span><span class="dc-tag t-cardio">كارديو</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="day-card" onclick="openDay('d2')" id="card-d2"><div class="dc-emoji">🦵</div><div class="dc-info"><div class="dc-day">اليوم 2 — الأحد</div><div class="dc-title">أرجل + كور</div><div class="dc-tags"><span class="dc-tag t-legs">أرجل</span><span class="dc-tag t-core">كور</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="day-card" onclick="openDay('d3')" id="card-d3"><div class="dc-emoji">💨</div><div class="dc-info"><div class="dc-day">اليوم 3 — الاثنين</div><div class="dc-title">لياقة + كارديو + حركة</div><div class="dc-tags"><span class="dc-tag t-cardio">كارديو</span><span class="dc-tag t-func">حركة</span><span class="dc-tag t-core">مرونة</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="day-card" onclick="openDay('d4')" id="card-d4"><div class="dc-emoji">💪</div><div class="dc-info"><div class="dc-day">اليوم 4 — الأربعاء</div><div class="dc-title">سحب + كارديو</div><div class="dc-tags"><span class="dc-tag t-pull">ظهر</span><span class="dc-tag t-pull">بايسبس</span><span class="dc-tag t-pull">كتف خلفي</span><span class="dc-tag t-cardio">كارديو</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="day-card" onclick="openDay('d5')" id="card-d5"><div class="dc-emoji">⚡</div><div class="dc-info"><div class="dc-day">اليوم 5 — الخميس</div><div class="dc-title">جسم كامل وظيفي</div><div class="dc-tags"><span class="dc-tag t-func">وظيفي</span><span class="dc-tag t-cardio">تحمّل</span><span class="dc-tag t-core">كور</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="day-card" onclick="openDay('rest')" id="card-rest"><div class="dc-emoji">😴</div><div class="dc-info"><div class="dc-day">الثلاثاء + الجمعة</div><div class="dc-title">راحة واستشفاء</div><div class="dc-tags"><span class="dc-tag t-rest">استشفاء</span><span class="dc-tag t-rest">مرونة</span></div></div><div class="dc-arrow">←</div></div>
+        <div class="food-card" onclick="openDay('food')"><div class="dc-emoji">🥗</div><div class="dc-info"><div class="dc-day">دليل</div><div class="dc-title">التغذية الرياضية</div></div><div class="dc-arrow">←</div></div>
+    </div>
+</div>
+
+<!-- DAY 1: PUSH + CARDIO -->
+<div class="screen" id="day-d1">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">دفع + كارديو</div><div class="day-top-count">السبت</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-push"><span class="emo">🔥</span><h2>دفع — صدر، أكتاف، ترايسبس</h2><p>تمارين مركّبة بأوزان معتدلة + كارديو — 65 دقيقة</p></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">1</div><div class="ex-title"><div class="ex-name">بنش بريس بالبار</div><div class="ex-en">Barbell Bench Press</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">75s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الصدر الأوسط</span><span class="musc">الكتف الأمامي</span><span class="musc">الترايسبس</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>استلقِ مع ثبات القدمين وقوس طبيعي بالظهر</li><li>قبضة أعرض من الكتفين — أنزل للصدر بتحكّم</li><li>ادفع للأعلى بقوة — زفير أثناء الدفع</li></ol></div>
+            <div class="sec"><div class="sec-t">✅ نصائح</div><ul class="tips"><li>وزن معتدل — ركّز على التحكّم لا الوزن الثقيل</li><li>لا ترتد البار عن الصدر</li></ul></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">2</div><div class="ex-title"><div class="ex-name">بنش مائل بالدمبل</div><div class="ex-en">Incline Dumbbell Press</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الصدر العلوي</span><span class="musc">الكتف الأمامي</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>بنش زاوية 30° — ادفع الدمبلز للأعلى</li><li>أنزل ببطء مع فتح الصدر</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">3</div><div class="ex-title"><div class="ex-name">بريس أكتاف بالدمبل</div><div class="ex-en">Dumbbell Shoulder Press</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shoulder_Press/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shoulder_Press/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الكتف الأمامي</span><span class="musc">الكتف الجانبي</span><span class="musc">الترايسبس</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>جالس أو واقف، دمبل عند الأذنين</li><li>ادفع للأعلى بالكامل — أنزل لمستوى الكتف</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">4</div><div class="ex-title"><div class="ex-name">رفع جانبي</div><div class="ex-en">Side Lateral Raise</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×15</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الكتف الجانبي</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>دمبل خفيف — ارفع للجانب حتى الكتف</li><li>أنزل ببطء — مِل الدمبل كصب الماء</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">5</div><div class="ex-title"><div class="ex-name">تمديد ترايسبس بالكابل</div><div class="ex-en">Triceps Pushdown</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×15</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الترايسبس</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>بكرة عالية — ادفع للأسفل مع ثبات المرفقين</li><li>اضغط الترايسبس — عُد ببطء</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-push">6</div><div class="ex-title"><div class="ex-name">ديبس</div><div class="ex-en">Dips</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×max</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dips_-_Chest_Version/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dips_-_Chest_Version/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الصدر السفلي</span><span class="musc">الترايسبس</span><span class="musc">الكتف الأمامي</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>أمسك المتوازي — مِل قليلاً للأمام</li><li>انزل حتى 90° ثم ادفع بقوة</li></ol></div>
+            <div class="sec"><div class="sec-t">✅ نصائح</div><ul class="tips"><li>تمرين وزن جسم ممتاز — يبني قوة وظيفية</li></ul></div>
+        </div></div>
+
+        <div class="cardio-box"><h3>🏃 كارديو — 15 دقيقة</h3><p>تريدمل: مشي سريع بميل 10-12% سرعة 5.5-6.5 كم/س، أو جري خفيف 8 كم/س لمدة 15 دقيقة</p></div>
+    </div>
+</div>
+
+<!-- DAY 2: LEGS + CORE -->
+<div class="screen" id="day-d2">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">أرجل + كور</div><div class="day-top-count">الأحد</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-legs"><span class="emo">🦵</span><h2>أرجل + كور</h2><p>قاعدة قوية وجذع ثابت — 70 دقيقة</p></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">1</div><div class="ex-title"><div class="ex-name">سكوات بالبار</div><div class="ex-en">Barbell Squat</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">90s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Squat/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Squat/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">فخذ أمامي</span><span class="musc">مؤخرة</span><span class="musc">فخذ خلفي</span><span class="musc">الجذع</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>القدمان أوسع من الكتفين — صدر مرفوع</li><li>انزل حتى التوازي أو أقل</li><li>ادفع بالكعبين — اضغط المؤخرة</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">2</div><div class="ex-title"><div class="ex-name">ديدلفت روماني</div><div class="ex-en">Romanian Deadlift</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">75s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Romanian_Deadlift/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Romanian_Deadlift/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الفخذ الخلفي</span><span class="musc">المؤخرة</span><span class="musc">أسفل الظهر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>ثني خفيف بالركبتين — انحنِ من الوركين</li><li>ظهر مستقيم — عُد بدفع الوركين للأمام</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">3</div><div class="ex-title"><div class="ex-name">لانجز بالدمبل (مشي)</div><div class="ex-en">Walking Dumbbell Lunges</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">لكل رجل</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Lunges/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Lunges/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">فخذ أمامي</span><span class="musc">مؤخرة</span><span class="musc">توازن</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>خطوة واسعة — الركبة الخلفية تقترب من الأرض</li><li>ادفع بالأمامية وتقدم بالأخرى — حركة مشي</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">4</div><div class="ex-title"><div class="ex-name">مكبس أرجل</div><div class="ex-en">Leg Press</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">فخذ أمامي</span><span class="musc">مؤخرة</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>القدمان بعرض الكتفين — أنزل حتى 90°</li><li>ادفع بقوة — لا تقفل الركبتين</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">5</div><div class="ex-title"><div class="ex-name">رفع سمانة</div><div class="ex-en">Standing Calf Raise</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×20</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Calf_Raises/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Calf_Raises/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">السمانة</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>قف على حافة درجة — أنزل الكعبين</li><li>ارفع واضغط ثانيتين في الأعلى</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">6</div><div class="ex-title"><div class="ex-name">بلانك</div><div class="ex-en">Plank</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×45s</div><div class="bd-l">ثبات</div></div><div class="bd"><div class="bd-v">30s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الجذع الكامل</span><span class="musc">البطن العميق</span><span class="musc">أسفل الظهر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>ساعدين على الأرض — جسم مستقيم كالخشبة</li><li>شدّ البطن والمؤخرة — لا ترفع أو تخفض الوسط</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-legs">7</div><div class="ex-title"><div class="ex-name">كرانش + رفع أرجل</div><div class="ex-en">Crunch + Leg Raise</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×15</div><div class="bd-l">لكل تمرين</div></div><div class="bd"><div class="bd-v">30s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Crunches/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Crunches/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">البطن العلوي</span><span class="musc">البطن السفلي</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li><strong>كرانش:</strong> ارفع الكتفين فقط — 15 تكرار</li><li><strong>رفع أرجل:</strong> استلقِ وارفع أرجل مستقيمة لـ90° — 15 تكرار</li><li>سوبرسيت بدون راحة بين التمرينين</li></ol></div>
+        </div></div>
+    </div>
+</div>
+
+<!-- DAY 3: CARDIO + MOVEMENT -->
+<div class="screen" id="day-d3">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">لياقة + كارديو + حركة</div><div class="day-top-count">الاثنين</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-cardio"><span class="emo">💨</span><h2>لياقة وحركة وكارديو</h2><p>يوم تحمّل ومرونة — بدون أوزان ثقيلة</p></div>
+
+        <div class="cardio-box"><h3>🔥 تسخين — 5 دقائق</h3><p>جري خفيف + حركات ديناميكية (دوائر ذراعين، فتح وركين، لانجز خفيفة)</p></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-cardio">1</div><div class="ex-title"><div class="ex-name">HIIT تريدمل أو دراجة</div><div class="ex-en">HIIT Intervals</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">15 دقيقة</div><div class="bd-l">الكارديو</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Running_Treadmill/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Running_Treadmill/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">القلب</span><span class="musc">الرئتين</span><span class="musc">التحمّل</span><span class="musc">حرق الدهون</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>30 ثانية سرعة عالية (90% جهد)</li><li>60 ثانية راحة (مشي أو بطيء)</li><li>كرّر 10 جولات = 15 دقيقة</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-cardio">2</div><div class="ex-title"><div class="ex-name">سيركت وزن الجسم</div><div class="ex-en">Bodyweight Circuit</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3 جولات</div><div class="bd-l">دائري</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Mountain_Climbers/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Mountain_Climbers/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">جسم كامل</span><span class="musc">تحمّل عضلي</span><span class="musc">تنسيق</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>10 بيربي</li><li>15 سكوات قفز</li><li>10 بوش أب</li><li>20 جبل متسلق (Mountain Climbers)</li><li>15 لانجز (بالتبادل)</li><li>راحة 90 ثانية بين الجولات</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">3</div><div class="ex-title"><div class="ex-name">تمارين حركة ومرونة</div><div class="ex-en">Mobility Flow</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">15 دقيقة</div><div class="bd-l">مرونة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">المرونة</span><span class="musc">الوركين</span><span class="musc">الأكتاف</span><span class="musc">العمود الفقري</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>World's Greatest Stretch — 5 لكل جانب</li><li>Cat-Cow — 10 تكرارات</li><li>Pigeon Stretch — 30 ثانية لكل جانب</li><li>تدوير أكتاف بعصا — 10 تكرارات</li><li>Hip 90/90 Stretch — 30 ثانية لكل جانب</li><li>Thoracic Rotation — 8 لكل جانب</li></ol></div>
+        </div></div>
+
+        <div class="cardio-box"><h3>🧘 تبريد — 5 دقائق</h3><p>مشي خفيف + إطالة ثابتة للعضلات الكبرى (فخذ، صدر، ظهر، أكتاف)</p></div>
+    </div>
+</div>
+
+<!-- DAY 4: PULL + CARDIO -->
+<div class="screen" id="day-d4">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">سحب + كارديو</div><div class="day-top-count">الأربعاء</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-pull"><span class="emo">💪</span><h2>سحب — ظهر، بايسبس، كتف خلفي</h2><p>بناء ظهر عريض ووضعية سليمة — 65 دقيقة</p></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">1</div><div class="ex-title"><div class="ex-name">سحب أمامي واسع</div><div class="ex-en">Lat Pulldown</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">75s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">المجنص (اللاتس)</span><span class="musc">البايسبس</span><span class="musc">الروم بويد</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>قبضة واسعة — اسحب نحو أعلى الصدر</li><li>ركّز على سحب المرفقين للأسفل والخلف</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">2</div><div class="ex-title"><div class="ex-name">تجديف بالكابل جالساً</div><div class="ex-en">Seated Cable Row</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الظهر الأوسط</span><span class="musc">الروم بويد</span><span class="musc">البايسبس</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>اسحب نحو البطن مع فتح الصدر</li><li>اضغط لوحي الكتف — عُد ببطء</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">3</div><div class="ex-title"><div class="ex-name">تجديف دمبل بذراع واحدة</div><div class="ex-en">One-Arm Dumbbell Row</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">لكل ذراع</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الظهر الأوسط</span><span class="musc">المجنص</span><span class="musc">البايسبس</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>سنّد يد وركبة على البنش</li><li>اسحب الدمبل نحو الورك — اضغط الظهر</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">4</div><div class="ex-title"><div class="ex-name">فيس بول</div><div class="ex-en">Face Pull</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×15</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Face_Pull/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Face_Pull/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الكتف الخلفي</span><span class="musc">الروتيتر كف</span><span class="musc">الترابيس الأوسط</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>بكرة عالية مع حبل</li><li>اسحب نحو الوجه — ادِر اليدين للخارج</li></ol></div>
+            <div class="sec"><div class="sec-t">✅ نصائح</div><ul class="tips"><li>أفضل تمرين لصحة الكتف والوضعية السليمة</li></ul></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">5</div><div class="ex-title"><div class="ex-name">بايسبس بار EZ</div><div class="ex-en">EZ-Bar Curl</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/EZ-Bar_Curl/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/EZ-Bar_Curl/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">البايسبس</span><span class="musc">الساعد</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>بار EZ بقبضة سفلية — ارفع بتحكّم</li><li>اضغط ثانية — أنزل ببطء في 3 ثوانٍ</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">6</div><div class="ex-title"><div class="ex-name">هامر كيرل</div><div class="ex-en">Hammer Curl</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curls/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curls/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">البايسبس</span><span class="musc">العضدية</span><span class="musc">الساعد</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>كفّان للداخل — ارفع بالتبادل</li><li>ثبات المرفقين — تحكّم كامل</li></ol></div>
+        </div></div>
+
+        <div class="cardio-box"><h3>🏃 كارديو — 15 دقيقة</h3><p>دراجة ثابتة: كل 2 دقيقة بدّل بين مقاومة متوسطة ومقاومة عالية مع سرعة</p></div>
+    </div>
+</div>
+
+<!-- DAY 5: FULL BODY FUNCTIONAL -->
+<div class="screen" id="day-d5">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">جسم كامل وظيفي</div><div class="day-top-count">الخميس</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-func"><span class="emo">⚡</span><h2>جسم كامل وظيفي</h2><p>تحسين الأداء الرياضي والقوة الوظيفية — 65 دقيقة</p></div>
+
+        <div class="cardio-box"><h3>🔥 تسخين — 5 دقائق</h3><p>جري خفيف + قفز بالحبل أو jumping jacks + حركات ديناميكية</p></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">1</div><div class="ex-title"><div class="ex-name">ديدلفت بالبار</div><div class="ex-en">Barbell Deadlift</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×8</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">90s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Deadlift/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Deadlift/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">جسم كامل</span><span class="musc">ظهر</span><span class="musc">أرجل</span><span class="musc">جذع</span><span class="musc">قبضة</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>قدمان بعرض الكتفين — البار فوق منتصف القدم</li><li>ظهر مستقيم — ارفع بدفع الأرض بالقدمين</li><li>قفل بالأعلى — أنزل ببطء بعكس الحركة</li></ol></div>
+            <div class="sec"><div class="sec-t">✅ نصائح</div><ul class="tips"><li>ملك التمارين الوظيفية — يعمل على كل شيء</li></ul></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">2</div><div class="ex-title"><div class="ex-name">بريس أكتاف واقف بالبار</div><div class="ex-en">Standing Barbell Press</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">75s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Shoulder_Press/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Shoulder_Press/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الأكتاف</span><span class="musc">الترايسبس</span><span class="musc">الجذع (ثبات)</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>واقف — البار عند الصدر</li><li>ادفع فوق الرأس — قفل الذراعين</li><li>شدّ البطن طوال الحركة</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">3</div><div class="ex-title"><div class="ex-name">تجديف بالبار</div><div class="ex-en">Bent Over Row</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×10</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">60s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الظهر</span><span class="musc">البايسبس</span><span class="musc">الكتف الخلفي</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>انحناء 45° — ظهر مستقيم</li><li>اسحب نحو أسفل الصدر — اضغط لوحي الكتف</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">4</div><div class="ex-title"><div class="ex-name">سيركت وظيفي (3 جولات)</div><div class="ex-en">Functional Circuit</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3 جولات</div><div class="bd-l">دائري</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Kettlebell_Sumo_High_Pull/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Kettlebell_Sumo_High_Pull/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">جسم كامل</span><span class="musc">تحمّل</span><span class="musc">حرق دهون</span><span class="musc">تنسيق</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>10 Kettlebell Swing (أو دمبل)</li><li>8 بوش أب</li><li>10 سكوات بالقفز</li><li>10 تجديف بالدمبل (5 لكل ذراع)</li><li>30 ثانية بلانك</li><li>10 لانجز بالقفز</li><li>راحة 90 ثانية بين الجولات</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">5</div><div class="ex-title"><div class="ex-name">كور — Farmer's Walk</div><div class="ex-en">Farmer's Walk + Dead Bug</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3 جولات</div><div class="bd-l">وظيفي</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Farmers_Walk/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Farmers_Walk/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الجذع</span><span class="musc">القبضة</span><span class="musc">الثبات</span><span class="musc">البطن العميق</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li><strong>Farmer's Walk:</strong> دمبل ثقيل في كل يد — امشِ 30 متر</li><li><strong>Dead Bug:</strong> استلقِ — ذراع وساق معاكسين ببطء — 10 لكل جانب</li><li>راحة 60 ثانية بين الجولات</li></ol></div>
+        </div></div>
+
+        <div class="cardio-box"><h3>🧘 تبريد — 10 دقائق</h3><p>فوم رولر + إطالة شاملة — ركّز على الوركين والأكتاف والفخذين</p></div>
+    </div>
+</div>
+
+<!-- REST DAYS -->
+<div class="screen" id="day-rest">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">راحة واستشفاء</div><div class="day-top-count">الثلاثاء + الجمعة</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-rest"><span class="emo">😴</span><h2>أيام الراحة</h2><p>الاستشفاء جزء من التدريب — لا تتخطاه</p></div>
+        <div class="rest-grid">
+            <div class="rest-c"><div class="ri">🚶</div><h3>مشي خفيف</h3><p>20-30 دقيقة مشي مريح. يحسّن الدورة الدموية ويسرّع الاستشفاء.</p></div>
+            <div class="rest-c"><div class="ri">🧘</div><h3>إطالة ومرونة</h3><p>15 دقيقة إطالة ثابتة. ثبّت كل وضعية 30 ثانية. ركّز على الوركين والأكتاف.</p></div>
+            <div class="rest-c"><div class="ri">💆</div><h3>فوم رولر</h3><p>10 دقائق — الفخذين، الظهر، السمانة، IT Band.</p></div>
+            <div class="rest-c"><div class="ri">💧</div><h3>ترطيب ونوم</h3><p>3-4 لترات ماء. نوم 7-9 ساعات. بروتين كافٍ.</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- NUTRITION -->
+<div class="screen" id="day-food">
+    <div class="day-top"><button class="back-btn" onclick="goHome()">→</button><div class="day-top-title">التغذية الرياضية</div><div class="day-top-count">دليل</div></div>
+    <div class="day-scroll">
+        <div class="day-banner db-food"><span class="emo">🥗</span><h2>تغذية الجسم الرياضي</h2><p>أكل نظيف + بروتين كافٍ = جسم لياقي</p></div>
+        <div class="info-c"><h3>📊 الاحتياج اليومي</h3><ul class="il"><li><strong>بروتين:</strong> 1.6-2 غ/كغ (بناء وإصلاح)</li><li><strong>كربوهيدرات:</strong> 3-4 غ/كغ (طاقة التمرين)</li><li><strong>دهون صحية:</strong> 0.8-1 غ/كغ (هرمونات ومفاصل)</li><li><strong>سعرات:</strong> صيانة أو عجز خفيف 200 سعرة</li><li><strong>ماء:</strong> 3-4 لترات يومياً</li></ul></div>
+        <div class="info-c"><h3>🥩 مصادر البروتين</h3><ul class="il"><li>صدور دجاج — 31غ/100غ</li><li>سمك (تونا، سلمون) — 25غ/100غ</li><li>بيض — 6غ/بيضة</li><li>لحم أحمر قليل الدهن — 26غ/100غ</li><li>زبادي يوناني — 10غ/100غ</li><li>بقوليات (عدس، حمص)</li></ul></div>
+        <div class="info-c"><h3>⏰ التوقيت</h3><ul class="il"><li><strong>قبل التمرين (1-2 ساعة):</strong> كربوهيدرات + بروتين خفيف</li><li><strong>بعد التمرين (30 دقيقة):</strong> بروتين سريع + كربوهيدرات</li><li><strong>قبل النوم:</strong> بروتين بطيء (زبادي، جبنة)</li></ul></div>
+        <div class="info-c"><h3>🚫 تجنّب</h3><ul class="il"><li>المشروبات الغازية والعصائر المصنّعة</li><li>الأكل المقلي والوجبات السريعة</li><li>السكر المضاف والحلويات بكثرة</li><li>الأكل قبل التمرين مباشرة</li></ul></div>
+        <div class="info-c"><h3>📈 التقدم</h3><table class="ptable"><tr><th>الأسابيع</th><th>التركيز</th></tr><tr><td>1-3</td><td>تعلّم الحركات وبناء القاعدة</td></tr><tr><td>4-6</td><td>زيادة تدريجية بالأوزان والشدة</td></tr><tr><td>7-9</td><td>رفع الكارديو وتقليل الراحة</td></tr><tr><td>10-12</td><td>أوزان أقوى + سيركت أصعب</td></tr></table></div>
+        <div class="cardio-box"><h3>💡 القاعدة الذهبية</h3><p>أتممت الحد الأعلى بسهولة؟ <strong>ارفع الوزن 5% أو قلّل الراحة 10 ثوانٍ</strong></p></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const quotes=[
+    'جسم الرياضي يُبنى بالانضباط لا بالأوزان الثقيلة 🏃',
+    'اللياقة أسلوب حياة مو تمرين ساعة 💪',
+    'حرّك جسمك كل يوم — حتى لو 20 دقيقة 🔥',
+    'التوازن بين القوة والمرونة = جسم رياضي حقيقي ⚡',
+    'الفرق بينك وبين أمس هو تمرين اليوم 🎯',
+    'الأكل النظيف + التمرين الذكي = النتيجة 🥗',
+    'لا تقارن نفسك — قارن نفسك بالأمس فقط 📈',
+    'الانضباط يغلب التحفيز — التزم! 🦾',
+    'أنت أقوى مما تظن — ثق بالعملية 👊',
+    'كل يوم تتحرك = استثمار في صحتك 💎'
+];
+document.getElementById('motiv').textContent=quotes[new Date().getDay()%quotes.length];
+const dayMap={0:'d2',1:'d3',2:'rest',3:'d4',4:'d5',5:'rest',6:'d1'};
+const today=dayMap[new Date().getDay()];
+const tc=document.getElementById('card-'+today);
+if(tc)tc.classList.add('today');
+function openDay(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('day-'+id).classList.add('active');
+    document.getElementById('day-'+id).querySelector('.day-scroll')?.scrollTo(0,0);
+}
+function goHome(){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('home').classList.add('active');
+}
+function tog(el){el.classList.toggle('open')}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+function forceUpdate(){
+    const btn=document.getElementById('upd-btn');
+    btn.classList.add('spinning');
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.getRegistrations().then(regs=>{
+            Promise.all(regs.map(r=>r.unregister())).then(()=>{
+                caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>{
+                    btn.classList.remove('spinning');
+                    location.reload(true);
+                });
+            });
+        });
+    }else{
+        btn.classList.remove('spinning');
+        location.reload(true);
+    }
+}
+</script>
+<button class="update-btn" id="upd-btn" onclick="forceUpdate()">🔄</button>
+</body>
+</html>
