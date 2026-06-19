@@ -131,14 +131,14 @@
         .bd-wt input::-webkit-inner-spin-button,.bd-wt input::-webkit-outer-spin-button{-webkit-appearance:none}
         .bd-wt .bd-l{font-size:0.55rem;color:var(--muted)}
         .bd-wt-prev{font-size:0.45rem;color:var(--pr);white-space:nowrap}
-        .ptr-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.92);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
-        .ptr-overlay.show{display:flex}
-        .ptr-spinner{width:50px;height:50px;border:4px solid rgba(255,107,53,0.2);border-top-color:var(--pr);border-radius:50%;animation:spin 0.7s linear infinite}
+        .ptr-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;margin:0 16px 8px;border-radius:12px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.15);min-height:42px;transition:all 0.3s}
+        .ptr-bar.pulling{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.35)}
+        .ptr-bar.refreshing{background:rgba(255,107,53,0.15);border-color:var(--pr)}
+        .ptr-hint{color:var(--muted);font-size:0.75rem;font-weight:700}
+        .ptr-bar.pulling .ptr-hint,.ptr-bar.refreshing .ptr-hint{color:var(--pr)}
+        .ptr-spinner{width:18px;height:18px;border:3px solid rgba(255,107,53,0.2);border-top-color:var(--pr);border-radius:50%;animation:spin 0.7s linear infinite;display:none}
+        .ptr-bar.refreshing .ptr-spinner{display:block}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .ptr-msg{color:var(--pr);font-size:1.1rem;font-weight:800}
-        .ptr-arrow{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;z-index:9999;overflow:hidden;transition:height 0.2s;background:var(--card)}
-        .ptr-arrow.show{height:50px;border-bottom:2px solid var(--pr)}
-        .ptr-arrow-text{color:var(--pr);font-size:0.85rem;font-weight:800}
         .ex-card.done{opacity:0.55}
         .ex-card.done .ex-n{background:#00b894!important;color:#fff!important}
         .ex-card.done .ex-n::after{content:'';display:none}
@@ -160,6 +160,7 @@
         <div class="motiv" id="motiv"></div>
     </div>
     <div class="home-scroll">
+        <div class="ptr-bar" id="ptr"><div class="ptr-spinner" id="ptr-spin"></div><span class="ptr-hint" id="ptr-text">⬇ اسحب للتحديث</span></div>
         <div class="day-card" onclick="openDay('d1')" id="card-d1"><div class="dc-emoji">🔥</div><div class="dc-info"><div class="dc-day">اليوم 1 — السبت</div><div class="dc-title">دفع + كارديو</div><div class="dc-tags"><span class="dc-tag t-push">صدر</span><span class="dc-tag t-push">أكتاف</span><span class="dc-tag t-push">ترايسبس</span><span class="dc-tag t-cardio">كارديو</span></div></div><div class="dc-arrow">←</div></div>
         <div class="day-card" onclick="openDay('d2')" id="card-d2"><div class="dc-emoji">🦵</div><div class="dc-info"><div class="dc-day">اليوم 2 — الأحد</div><div class="dc-title">أرجل + كور</div><div class="dc-tags"><span class="dc-tag t-legs">أرجل</span><span class="dc-tag t-core">كور</span></div></div><div class="dc-arrow">←</div></div>
         <div class="day-card" onclick="openDay('d3')" id="card-d3"><div class="dc-emoji">💨</div><div class="dc-info"><div class="dc-day">اليوم 3 — الاثنين</div><div class="dc-title">لياقة + كارديو + حركة</div><div class="dc-tags"><span class="dc-tag t-cardio">كارديو</span><span class="dc-tag t-func">حركة</span><span class="dc-tag t-core">مرونة</span></div></div><div class="dc-arrow">←</div></div>
@@ -447,7 +448,6 @@
 </div>
 
 </div>
-<div class="ptr" id="ptr"><div class="ptr-spin" id="ptr-spin" style="display:none"></div><span class="ptr-text"></span></div>
 
 <script>
 const quotes=[
@@ -478,31 +478,33 @@ function goHome(){
 }
 function tog(el){el.classList.toggle('open')}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+const ptr=document.getElementById('ptr'),ptrText=document.getElementById('ptr-text');
 let ptrStart=0,ptrPulling=false;
-const ptr=document.getElementById('ptr'),ptrSpin=document.getElementById('ptr-spin');
-document.addEventListener('touchstart',e=>{
-    const scr=document.querySelector('.screen.active .day-scroll')||document.querySelector('.screen.active .home-scroll');
-    if(scr&&scr.scrollTop===0) ptrStart=e.touches[0].clientY;
-    else if(!scr&&window.scrollY===0) ptrStart=e.touches[0].clientY;
+const homeScroll=document.querySelector('.home-scroll');
+homeScroll.addEventListener('touchstart',e=>{
+    if(homeScroll.scrollTop===0) ptrStart=e.touches[0].clientY;
 },{passive:true});
-document.addEventListener('touchmove',e=>{
+homeScroll.addEventListener('touchmove',e=>{
     if(!ptrStart)return;
     const diff=e.touches[0].clientY-ptrStart;
-    if(diff>10&&!ptrPulling){ptr.classList.add('active');ptr.querySelector('.ptr-text').textContent='⬇ اسحب للتحديث';}
-    if(diff>60&&!ptrPulling){ptrPulling=true;ptr.querySelector('.ptr-text').textContent='⬆ أفلت للتحديث';}
+    if(diff>10){ptr.classList.add('pulling');ptrText.textContent='⬇ اسحب للتحديث';}
+    if(diff>60&&!ptrPulling){ptrPulling=true;ptrText.textContent='⬆ أفلت للتحديث';}
 },{passive:true});
-document.addEventListener('touchend',()=>{
+homeScroll.addEventListener('touchend',()=>{
     if(ptrPulling){
-        ptr.querySelector('.ptr-text').textContent='جاري التحديث...';
-        ptrSpin.style.display='block';
+        ptr.classList.remove('pulling');
+        ptr.classList.add('refreshing');
+        ptrText.textContent='جاري التحديث...';
         if('serviceWorker' in navigator){
             navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))).then(()=>
                 caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload(true))
             );
         }else location.reload(true);
+    }else{
+        ptr.classList.remove('pulling');
+        ptrText.textContent='⬇ اسحب للتحديث';
     }
-    if(!ptrPulling){ptrStart=0;ptr.classList.remove('active');}
-    ptrPulling=false;
+    ptrStart=0;ptrPulling=false;
 });
 
 function getDoneKey(dayId,idx){return 'done_'+dayId+'_'+idx+'_w'+getWeek()}
