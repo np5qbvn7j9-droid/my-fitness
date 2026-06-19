@@ -131,9 +131,18 @@
         .bd-wt input::-webkit-inner-spin-button,.bd-wt input::-webkit-outer-spin-button{-webkit-appearance:none}
         .bd-wt .bd-l{font-size:0.55rem;color:var(--muted)}
         .bd-wt-prev{font-size:0.45rem;color:var(--pr);white-space:nowrap}
-        .ptr{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;z-index:9999;overflow:hidden;transition:height 0.2s}
-        .ptr.active{height:50px;background:var(--card)}
-        .ptr-text{color:var(--pr);font-size:0.8rem;font-weight:700}
+        .ptr{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;gap:10px;z-index:9999;overflow:hidden;transition:height 0.3s ease}
+        .ptr.active{height:56px;background:var(--card);border-bottom:2px solid var(--pr);box-shadow:0 4px 20px rgba(255,107,53,0.15)}
+        .ptr-text{color:var(--pr);font-size:0.85rem;font-weight:800}
+        .ptr-spin{width:22px;height:22px;border:3px solid rgba(255,107,53,0.2);border-top-color:var(--pr);border-radius:50%;animation:spin 0.8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .ex-card.done{opacity:0.55}
+        .ex-card.done .ex-n{background:#00b894!important;color:#fff!important}
+        .ex-card.done .ex-n::after{content:'';display:none}
+        .ex-check{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;opacity:0;font-size:0.75rem}
+        .ex-card.done .ex-check{opacity:1}
+        .ex-card.done .ex-n-num{opacity:0}
+        .ex-n{position:relative}
     </style>
 </head>
 <body>
@@ -317,10 +326,10 @@
             <div class="sec"><div class="sec-t">✅ نصائح</div><ul class="tips"><li>أفضل تمرين لصحة الكتف والوضعية السليمة</li></ul></div>
         </div></div>
 
-        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">5</div><div class="ex-title"><div class="ex-name">بايسبس بالجهاز</div><div class="ex-en">Machine Bicep Curl</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
-            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Machine_Bicep_Curl/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Machine_Bicep_Curl/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">5</div><div class="ex-title"><div class="ex-name">بايسبس بالدمبل</div><div class="ex-en">Dumbbell Bicep Curl</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bicep_Curl/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bicep_Curl/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
             <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">البايسبس</span><span class="musc">الساعد</span></div></div>
-            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>بار EZ بقبضة سفلية — ارفع بتحكّم</li><li>اضغط ثانية — أنزل ببطء في 3 ثوانٍ</li></ol></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>دمبل في كل يد — كفّان للأمام</li><li>ارفع بتحكّم — اضغط البايسبس ثانية بالأعلى</li><li>أنزل ببطء في 3 ثوانٍ — بالتبادل أو سوا</li></ol></div>
         </div></div>
 
         <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-pull">6</div><div class="ex-title"><div class="ex-name">هامر كيرل بالكابل</div><div class="ex-en">Cable Hammer Curls - Rope Attachment</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">3×12</div><div class="bd-l">مجموعات</div></div><div class="bd"><div class="bd-v">45s</div><div class="bd-l">راحة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
@@ -436,29 +445,52 @@ function goHome(){
 function tog(el){el.classList.toggle('open')}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 let ptrStart=0,ptrPulling=false;
-const ptr=document.getElementById('ptr');
+const ptr=document.getElementById('ptr'),ptrSpin=document.getElementById('ptr-spin');
 document.addEventListener('touchstart',e=>{
-    if(window.scrollY===0||document.querySelector('.home-scroll,.day-scroll')){
-        const scr=document.querySelector('.screen.active .day-scroll')||document.querySelector('.screen.active .home-scroll');
-        if(scr&&scr.scrollTop===0) ptrStart=e.touches[0].clientY;
-        else if(!scr) ptrStart=e.touches[0].clientY;
-    }
+    const scr=document.querySelector('.screen.active .day-scroll')||document.querySelector('.screen.active .home-scroll');
+    if(scr&&scr.scrollTop===0) ptrStart=e.touches[0].clientY;
+    else if(!scr&&window.scrollY===0) ptrStart=e.touches[0].clientY;
 },{passive:true});
 document.addEventListener('touchmove',e=>{
     if(!ptrStart)return;
     const diff=e.touches[0].clientY-ptrStart;
-    if(diff>60&&!ptrPulling){ptrPulling=true;ptr.classList.add('active');ptr.querySelector('.ptr-text').textContent='🔄 أفلت للتحديث';}
+    if(diff>10&&!ptrPulling){ptr.classList.add('active');ptr.querySelector('.ptr-text').textContent='⬇ اسحب للتحديث';}
+    if(diff>60&&!ptrPulling){ptrPulling=true;ptr.querySelector('.ptr-text').textContent='⬆ أفلت للتحديث';}
 },{passive:true});
 document.addEventListener('touchend',()=>{
     if(ptrPulling){
         ptr.querySelector('.ptr-text').textContent='جاري التحديث...';
+        ptrSpin.style.display='block';
         if('serviceWorker' in navigator){
             navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))).then(()=>
                 caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload(true))
             );
         }else location.reload(true);
     }
-    ptrStart=0;ptrPulling=false;ptr.classList.remove('active');
+    if(!ptrPulling){ptrStart=0;ptr.classList.remove('active');}
+    ptrPulling=false;
+});
+
+function getDoneKey(dayId,idx){return 'done_'+dayId+'_'+idx+'_w'+getWeek()}
+document.querySelectorAll('.ex-card').forEach(card=>{
+    const head=card.querySelector('.ex-head');
+    const numEl=card.querySelector('.ex-n');
+    if(!numEl||!head)return;
+    const dayScreen=card.closest('.screen');
+    if(!dayScreen)return;
+    const dayId=dayScreen.id.replace('day-','');
+    const cards=dayScreen.querySelectorAll('.ex-card');
+    let idx=0;
+    for(let i=0;i<cards.length;i++){if(cards[i]===card){idx=i;break;}}
+    const num=numEl.textContent;
+    numEl.innerHTML='<span class="ex-n-num">'+num+'</span><span class="ex-check">✓</span>';
+    if(localStorage.getItem(getDoneKey(dayId,idx))) card.classList.add('done');
+    numEl.addEventListener('click',function(e){
+        e.stopPropagation();
+        card.classList.toggle('done');
+        if(card.classList.contains('done')) localStorage.setItem(getDoneKey(dayId,idx),'1');
+        else localStorage.removeItem(getDoneKey(dayId,idx));
+    });
 });
 
 const noWeight=['Plank','Crunch','HIIT','Bodyweight Circuit','Mobility Flow','Dip Machine','Functional Circuit','Farmer'];
@@ -490,6 +522,6 @@ document.querySelectorAll('.ex-card').forEach(card=>{
     badges.appendChild(bd);
 });
 </script>
-<div class="ptr" id="ptr"><span class="ptr-text"></span></div>
+<div class="ptr" id="ptr"><div class="ptr-spin" id="ptr-spin" style="display:none"></div><span class="ptr-text"></span></div>
 </body>
 </html>
