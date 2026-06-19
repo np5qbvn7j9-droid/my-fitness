@@ -131,10 +131,9 @@
         .bd-wt input::-webkit-inner-spin-button,.bd-wt input::-webkit-outer-spin-button{-webkit-appearance:none}
         .bd-wt .bd-l{font-size:0.55rem;color:var(--muted)}
         .bd-wt-prev{font-size:0.45rem;color:var(--pr);white-space:nowrap}
-        .update-btn{position:fixed;bottom:calc(20px + var(--safe-b));left:20px;width:48px;height:48px;border-radius:50%;background:var(--pr);color:#fff;border:none;font-size:1.3rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(255,107,53,0.4);z-index:999;cursor:pointer;transition:transform 0.3s}
-        .update-btn:active{transform:scale(0.9)}
-        .update-btn.spinning{animation:spin 1s linear infinite}
-        @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        .ptr{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;z-index:9999;overflow:hidden;transition:height 0.2s}
+        .ptr.active{height:50px;background:var(--card)}
+        .ptr-text{color:var(--pr);font-size:0.8rem;font-weight:700}
     </style>
 </head>
 <body>
@@ -436,23 +435,31 @@ function goHome(){
 }
 function tog(el){el.classList.toggle('open')}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-function forceUpdate(){
-    const btn=document.getElementById('upd-btn');
-    btn.classList.add('spinning');
-    if('serviceWorker' in navigator){
-        navigator.serviceWorker.getRegistrations().then(regs=>{
-            Promise.all(regs.map(r=>r.unregister())).then(()=>{
-                caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>{
-                    btn.classList.remove('spinning');
-                    location.reload(true);
-                });
-            });
-        });
-    }else{
-        btn.classList.remove('spinning');
-        location.reload(true);
+let ptrStart=0,ptrPulling=false;
+const ptr=document.getElementById('ptr');
+document.addEventListener('touchstart',e=>{
+    if(window.scrollY===0||document.querySelector('.home-scroll,.day-scroll')){
+        const scr=document.querySelector('.screen.active .day-scroll')||document.querySelector('.screen.active .home-scroll');
+        if(scr&&scr.scrollTop===0) ptrStart=e.touches[0].clientY;
+        else if(!scr) ptrStart=e.touches[0].clientY;
     }
-}
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+    if(!ptrStart)return;
+    const diff=e.touches[0].clientY-ptrStart;
+    if(diff>60&&!ptrPulling){ptrPulling=true;ptr.classList.add('active');ptr.querySelector('.ptr-text').textContent='🔄 أفلت للتحديث';}
+},{passive:true});
+document.addEventListener('touchend',()=>{
+    if(ptrPulling){
+        ptr.querySelector('.ptr-text').textContent='جاري التحديث...';
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))).then(()=>
+                caches.keys().then(k=>Promise.all(k.map(c=>caches.delete(c)))).then(()=>location.reload(true))
+            );
+        }else location.reload(true);
+    }
+    ptrStart=0;ptrPulling=false;ptr.classList.remove('active');
+});
 
 const noWeight=['Plank','Crunch','HIIT','Bodyweight Circuit','Mobility Flow','Dip Machine','Functional Circuit','Farmer'];
 function getWeek(){const d=new Date(),start=new Date(d.getFullYear(),0,1);return Math.ceil(((d-start)/86400000+start.getDay()+1)/7)}
@@ -483,6 +490,6 @@ document.querySelectorAll('.ex-card').forEach(card=>{
     badges.appendChild(bd);
 });
 </script>
-<button class="update-btn" id="upd-btn" onclick="forceUpdate()">🔄</button>
+<div class="ptr" id="ptr"><span class="ptr-text"></span></div>
 </body>
 </html>
