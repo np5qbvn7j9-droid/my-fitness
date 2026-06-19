@@ -131,11 +131,14 @@
         .bd-wt input::-webkit-inner-spin-button,.bd-wt input::-webkit-outer-spin-button{-webkit-appearance:none}
         .bd-wt .bd-l{font-size:0.55rem;color:var(--muted)}
         .bd-wt-prev{font-size:0.45rem;color:var(--pr);white-space:nowrap}
-        .ptr{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;gap:10px;z-index:9999;overflow:hidden;transition:height 0.3s ease}
-        .ptr.active{height:56px;background:var(--card);border-bottom:2px solid var(--pr);box-shadow:0 4px 20px rgba(255,107,53,0.15)}
-        .ptr-text{color:var(--pr);font-size:0.85rem;font-weight:800}
-        .ptr-spin{width:22px;height:22px;border:3px solid rgba(255,107,53,0.2);border-top-color:var(--pr);border-radius:50%;animation:spin 0.8s linear infinite}
+        .ptr-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.92);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+        .ptr-overlay.show{display:flex}
+        .ptr-spinner{width:50px;height:50px;border:4px solid rgba(255,107,53,0.2);border-top-color:var(--pr);border-radius:50%;animation:spin 0.7s linear infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
+        .ptr-msg{color:var(--pr);font-size:1.1rem;font-weight:800}
+        .ptr-arrow{position:fixed;top:0;left:0;right:0;height:0;display:flex;align-items:center;justify-content:center;z-index:9999;overflow:hidden;transition:height 0.2s;background:var(--card)}
+        .ptr-arrow.show{height:50px;border-bottom:2px solid var(--pr)}
+        .ptr-arrow-text{color:var(--pr);font-size:0.85rem;font-weight:800}
         .ex-card.done{opacity:0.55}
         .ex-card.done .ex-n{background:#00b894!important;color:#fff!important}
         .ex-card.done .ex-n::after{content:'';display:none}
@@ -285,10 +288,40 @@
             <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>10 بيربي</li><li>15 سكوات قفز</li><li>10 بوش أب</li><li>20 جبل متسلق (Mountain Climbers)</li><li>15 لانجز (بالتبادل)</li><li>راحة 90 ثانية بين الجولات</li></ol></div>
         </div></div>
 
-        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">3</div><div class="ex-title"><div class="ex-name">تمارين حركة ومرونة</div><div class="ex-en">Mobility Flow</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">15 دقيقة</div><div class="bd-l">مرونة</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">3</div><div class="ex-title"><div class="ex-name">إطالة الورك الكبرى</div><div class="ex-en">Groiners (World's Greatest Stretch)</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">5</div><div class="bd-l">لكل جانب</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Groiners/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Groiners/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الوركين</span><span class="musc">الفخذ الداخلي</span><span class="musc">أسفل الظهر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>خطوة لانج أمامية واسعة — ثبّت اليدين على الأرض</li><li>أنزل الورك للأسفل — حاول تلمس المرفق الأرض</li><li>لفّ الجسم وارفع اليد للسقف — ثبّت 3 ثوانٍ ثم بدّل</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">4</div><div class="ex-title"><div class="ex-name">قطة - بقرة</div><div class="ex-en">Cat Stretch (Cat-Cow)</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">10</div><div class="bd-l">تكرارات</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
             <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
-            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">المرونة</span><span class="musc">الوركين</span><span class="musc">الأكتاف</span><span class="musc">العمود الفقري</span></div></div>
-            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>World's Greatest Stretch — 5 لكل جانب</li><li>Cat-Cow — 10 تكرارات</li><li>Pigeon Stretch — 30 ثانية لكل جانب</li><li>تدوير أكتاف بعصا — 10 تكرارات</li><li>Hip 90/90 Stretch — 30 ثانية لكل جانب</li><li>Thoracic Rotation — 8 لكل جانب</li></ol></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">العمود الفقري</span><span class="musc">أسفل الظهر</span><span class="musc">البطن</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>على أربع — يدين تحت الأكتاف وركب تحت الوركين</li><li>ارفع الظهر للأعلى وكوّره (قطة) — أنزل الرأس</li><li>اخفض الظهر وارفع الرأس والمؤخرة (بقرة) — حركة بطيئة مع التنفس</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">5</div><div class="ex-title"><div class="ex-name">إطالة ثني الورك</div><div class="ex-en">Kneeling Hip Flexor</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">30s</div><div class="bd-l">لكل جانب</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Kneeling_Hip_Flexor/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Kneeling_Hip_Flexor/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">ثني الورك</span><span class="musc">الفخذ الأمامي</span><span class="musc">المؤخرة</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>اركع على ركبة واحدة — الأمامية مثنية 90°</li><li>ادفع الورك للأمام — تحس الإطالة بمقدمة الفخذ الخلفي</li><li>ثبّت 30 ثانية — ارفع اليدين فوق للمزيد من الإطالة</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">6</div><div class="ex-title"><div class="ex-name">تدوير الأكتاف</div><div class="ex-en">Arm Circles</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">10</div><div class="bd-l">لكل اتجاه</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Arm_Circles/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Arm_Circles/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الأكتاف</span><span class="musc">الروتيتر كف</span><span class="musc">أعلى الظهر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>قف ومدّ ذراعيك للجانب بمستوى الكتف</li><li>دوائر صغيرة للأمام 10 مرات — ثم للخلف 10 مرات</li><li>كبّر الدوائر تدريجياً — حافظ على الذراعين مستقيمتين</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">7</div><div class="ex-title"><div class="ex-name">إطالة الورك 90/90</div><div class="ex-en">Standing Hip Circles</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">30s</div><div class="bd-l">لكل جانب</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Hip_Circles/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Hip_Circles/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">الوركين</span><span class="musc">المؤخرة</span><span class="musc">أسفل الظهر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>قف على رجل واحدة — ارفع الركبة الثانية</li><li>دوّر الورك بدوائر كبيرة — للأمام ثم للخلف</li><li>حافظ على ثبات الجذع — بدّل الجانب</li></ol></div>
+        </div></div>
+
+        <div class="ex-card" onclick="tog(this)"><div class="ex-head"><div class="ex-n n-func">8</div><div class="ex-title"><div class="ex-name">لفّ أعلى الظهر</div><div class="ex-en">Lying Crossover</div></div><div class="ex-badges"><div class="bd"><div class="bd-v">8</div><div class="bd-l">لكل جانب</div></div></div><span class="ex-arr">▼</span></div><div class="ex-body">
+            <div class="ex-anim-wrap"><img class="frame f0" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lying_Crossover/0.jpg" alt=""><img class="frame f1" src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lying_Crossover/1.jpg" alt=""><div class="anim-tag">▶ حركة متحركة</div></div>
+            <div class="sec"><div class="sec-t">🎯 يستهدف</div><div class="muscles"><span class="musc">أعلى الظهر</span><span class="musc">العمود الفقري</span><span class="musc">الصدر</span></div></div>
+            <div class="sec"><div class="sec-t">📋 الأداء</div><ol class="steps"><li>استلقِ على ظهرك — الركبتين مثنية</li><li>أنزل الركبتين لجانب واحد — افتح الذراع المعاكسة للجهة الثانية</li><li>ثبّت ثانيتين — ارجع وبدّل الجانب</li></ol></div>
         </div></div>
 
         <div class="cardio-box"><h3>🧘 تبريد — 5 دقائق</h3><p>مشي خفيف + إطالة ثابتة للعضلات الكبرى (فخذ، صدر، ظهر، أكتاف)</p></div>
